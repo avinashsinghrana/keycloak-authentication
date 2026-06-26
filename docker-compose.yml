@@ -1,0 +1,85 @@
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.2
+    container_name: keycloak
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://host.docker.internal:5432/keycloak-anti
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: credable
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: start-dev
+    ports:
+      - "8080:8080"
+    networks:
+      - auth_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: auth_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - auth_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: auth_zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - auth_network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: auth_kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+
+      KAFKA_ZOOKEEPER_CONNECT: auth_zookeeper:2181
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://auth_kafka:29092,PLAINTEXT_HOST://localhost:9092
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - auth_network
+  auth-service:
+    image: auth-anti-service:latest
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    depends_on:
+      - keycloak
+      - redis
+      - kafka
+    networks:
+      - auth_network
+networks:
+  auth_network:
+    driver: bridge

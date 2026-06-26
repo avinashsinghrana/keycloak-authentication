@@ -1,0 +1,105 @@
+{
+    "info": {
+        "name": "Auth Service API",
+        "description": "Collection for Auth Service",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:8081/api/v1/auth/register",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8081",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"password123\",\n  \"mobile\": \"+1234567890\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"deviceId\": \"DEV-123\",\n  \"deviceName\": \"Iphone 13\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:8081/api/v1/auth/login",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8081",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"test@test.com\",\n  \"password\": \"password123\",\n  \"deviceId\": \"DEV-123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Device",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:8081/api/v1/auth/device/verify",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8081",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "device",
+                                "verify"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"identifier\": \"test@test.com\",\n  \"deviceId\": \"DEV-123\",\n  \"otp\": \"123456\"\n}"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
