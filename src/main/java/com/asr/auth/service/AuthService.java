@@ -3,6 +3,7 @@ package com.asr.auth.service;
 import com.asr.auth.domain.entity.AppUser;
 import com.asr.auth.domain.entity.RegisteredDevice;
 import com.asr.auth.domain.enums.DeviceStatus;
+import com.asr.auth.domain.enums.UserStatus;
 import com.asr.auth.dto.request.DeviceVerificationRequest;
 import com.asr.auth.dto.request.LoginRequest;
 import com.asr.auth.dto.request.RegisterRequest;
@@ -104,6 +105,11 @@ public class AuthService {
         }
 
         deviceService.verifyDevice(device);
+        
+        if (user.getStatus() == UserStatus.PENDING_VERIFICATION) {
+            user.setStatus(com.asr.auth.domain.enums.UserStatus.ACTIVE);
+            userService.saveUser(user);
+        }
         
         auditService.logAction(user, "DEVICE_VERIFIED", "Device " + request.getDeviceId() + " verified", null);
 

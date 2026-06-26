@@ -1,15 +1,27 @@
 {
     "info": {
-        "name": "Auth Service API",
-        "description": "Collection for Auth Service",
+        "name": "Auth Service Complete API",
+        "description": "Complete collection for Auth Service including Registration, Login, Devices, Sessions, and Role/API mapping administration.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8081/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "YOUR_ACCESS_TOKEN_HERE",
+            "type": "string"
+        }
+    ],
     "item": [
         {
             "name": "Auth",
             "item": [
                 {
-                    "name": "Register User",
+                    "name": "1. Register User",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -19,18 +31,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "http://localhost:8081/api/v1/auth/register",
-                            "protocol": "http",
-                            "host": [
-                                "localhost"
-                            ],
-                            "port": "8081",
-                            "path": [
-                                "api",
-                                "v1",
-                                "auth",
-                                "register"
-                            ]
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
                         },
                         "body": {
                             "mode": "raw",
@@ -39,7 +42,7 @@
                     }
                 },
                 {
-                    "name": "Login",
+                    "name": "2. Verify Device",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -49,53 +52,227 @@
                             }
                         ],
                         "url": {
-                            "raw": "http://localhost:8081/api/v1/auth/login",
-                            "protocol": "http",
-                            "host": [
-                                "localhost"
-                            ],
-                            "port": "8081",
-                            "path": [
-                                "api",
-                                "v1",
-                                "auth",
-                                "login"
-                            ]
+                            "raw": "{{base_url}}/auth/device/verify",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "device", "verify"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"identifier\": \"test@test.com\",\n  \"deviceId\": \"DEV-123\",\n  \"otp\": \"123456\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "3. Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if(jsonData.success && jsonData.data && jsonData.data.accessToken) {",
+                                    "    pm.collectionVariables.set(\"access_token\", jsonData.data.accessToken);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
                         },
                         "body": {
                             "mode": "raw",
                             "raw": "{\n  \"username\": \"test@test.com\",\n  \"password\": \"password123\",\n  \"deviceId\": \"DEV-123\"\n}"
                         }
                     }
+                }
+            ]
+        },
+        {
+            "name": "User & Devices",
+            "item": [
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/user/profile",
+                            "host": ["{{base_url}}"],
+                            "path": ["user", "profile"]
+                        }
+                    }
                 },
                 {
-                    "name": "Verify Device",
+                    "name": "Get My Devices",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/devices",
+                            "host": ["{{base_url}}"],
+                            "path": ["devices"]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout All Devices",
                     "request": {
                         "method": "POST",
                         "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/session/logout/all",
+                            "host": ["{{base_url}}"],
+                            "path": ["session", "logout", "all"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin (Requires ADMIN Role)",
+            "item": [
+                {
+                    "name": "Get Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/dashboard",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "dashboard"]
+                        }
+                    }
+                },
+                {
+                    "name": "Register API Master",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
                             }
                         ],
                         "url": {
-                            "raw": "http://localhost:8081/api/v1/auth/device/verify",
-                            "protocol": "http",
-                            "host": [
-                                "localhost"
-                            ],
-                            "port": "8081",
-                            "path": [
-                                "api",
-                                "v1",
-                                "auth",
-                                "device",
-                                "verify"
-                            ]
+                            "raw": "{{base_url}}/admin/roles/api-master",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "roles", "api-master"]
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"identifier\": \"test@test.com\",\n  \"deviceId\": \"DEV-123\",\n  \"otp\": \"123456\"\n}"
+                            "raw": "{\n  \"method\": \"GET\",\n  \"path\": \"/api/v1/user/profile\",\n  \"description\": \"Fetch user profile\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Registered APIs",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/roles/api-master",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "roles", "api-master"]
+                        }
+                    }
+                },
+                {
+                    "name": "Assign API to Role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/roles/assign-api",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "roles", "assign-api"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"roleName\": \"CUSTOMER\",\n  \"apiId\": \"REPLACE_WITH_UUID_FROM_GET_ALL_APIS\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get APIs Mapped to Role",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/roles/CUSTOMER/apis",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "roles", "CUSTOMER", "apis"]
+                        }
+                    }
+                },
+                {
+                    "name": "Remove API from Role",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/roles/CUSTOMER/apis/REPLACE_WITH_UUID",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "roles", "CUSTOMER", "apis", "REPLACE_WITH_UUID"]
                         }
                     }
                 }

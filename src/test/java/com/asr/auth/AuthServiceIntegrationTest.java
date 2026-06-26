@@ -8,7 +8,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 class AuthServiceIntegrationTest {
 
@@ -37,6 +37,16 @@ class AuthServiceIntegrationTest {
         // Mock security issuer uri
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> "http://localhost:8080/realms/test-realm");
         registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", () -> "http://localhost:8080/realms/test-realm/protocol/openid-connect/certs");
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.boot.test.web.client.TestRestTemplate restTemplate;
+
+    @Test
+    void testSwaggerUiLoads() {
+        org.springframework.http.ResponseEntity<String> response = restTemplate.getForEntity("/v3/api-docs", String.class);
+        System.out.println("Swagger Response Status: " + response.getStatusCode());
+        System.out.println("Swagger Response Body: " + response.getBody());
     }
 
     @Test

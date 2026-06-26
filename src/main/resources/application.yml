@@ -55,4 +55,5 @@ logging:
     com.asr: DEBUG
     org.springframework.web: INFO
 springdoc:
-  pathsToExclude: /error
+  packages-to-scan: com.asr.auth.controller
+  paths-to-exclude: /error

@@ -23,20 +23,17 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/microservice-realm
-          jwk-set-uri: http://localhost:8080/realms/microservice-realm/protocol/openid-connect/certs
-
-springdoc:
-  pathsToExclude: /error
+          issuer-uri: http://keycloak:8080/realms/microservice-realm
+          jwk-set-uri: http://keycloak:8080/realms/microservice-realm/protocol/openid-connect/certs
 
   data:
     redis:
-      host: localhost
+      host: auth_redis
       port: 6379
   cache:
     type: redis
   kafka:
-    bootstrap-servers: auth-kafka:9092
+    bootstrap-servers: auth_kafka:29092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -47,7 +44,7 @@ keycloak:
   server-url: http://keycloak:8080
   realm: microservice-realm
   client-id: auth-service-client
-  client-secret: "XGlVtEwXOtoKnlLdMj3JE4t1Kmhf8ZMK" # Replace with actual secret or use env var
+  client-secret: XGlVtEwXOtoKnlLdMj3JE4t1Kmhf8ZMK # Replace with actual secret or use env var
   admin:
     username: admin
     password: admin
@@ -57,3 +54,6 @@ logging:
     org.springframework.security: DEBUG
     com.asr: DEBUG
     org.springframework.web: INFO
+springdoc:
+  packages-to-scan: com.asr.auth.controller
+  paths-to-exclude: /error
